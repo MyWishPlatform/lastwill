@@ -1,70 +1,99 @@
-pragma solidity ^0.4.2;
-contract token { function transfer(address receiver, uint amount){  } }
+pragma solidity ^0.4.1;
 
-contract Crowdsale {
-    address public target_addr;
-    uint public fundingGoal; uint public amountRaised; uint public deadline; uint public price;
-    token public tokenReward;
-    mapping(address => uint256) public balanceOf;
-    bool fundingGoalReached = false;
-    event GoalReached(address target_addr, uint amountRaised);
-    event FundTransfer(address backer, uint amount, bool isContribution);
-    bool completed = false;
+import 'zeppelin-solidity/contracts/token/BasicToken.sol';
+import 'zeppelin-solidity/contracts/ownership/Ownable.sol';
 
 
-    function Crowdsale(
-        address ifSuccessfulSendTo,
-        uint fundingGoalInEthers,
-        uint durationInMinutes,
-        uint etherCostOfEachToken,
-        token addressOfTokenUsedAsReward
+contract PreICOLastWillToken is BasicToken, Ownable {
+
+    string public name;
+
+    string public symbol;
+
+    // how many token units a buyer gets per wei
+    uint256 public rate;
+
+    // a minimal amount to ether we need to gather
+    uint256 public softcap;
+
+    // max we cat gather
+    uint256 public hardcap;
+
+    // total tokens sold
+    uint256 public totalSupply;
+
+    // timestamp
+    uint256 public deadline;
+
+    bool public active = true;
+
+    address public contractOwner;
+
+    // mapping does not support iteration,
+    // so we need duplicate balance as array for return funds to investors if pre ico fails
+    struct Funder {
+        address addr;
+        uint amount;
+    }
+
+    Funder[] balancesForReturn;
+
+    function PreICOLastWillToken(
+            uint256 _rate,
+            string _name,
+            string _symbol,
+            uint256 _softcap,
+            uint256 _hardcap,
+            address _contractOwner
     ) {
-        target_addr = ifSuccessfulSendTo;
-        fundingGoal = fundingGoalInEthers * 1 ether;
-        deadline = now + durationInMinutes * 1 minutes;
-        price = etherCostOfEachToken * 1 ether;
-        tokenReward = token(addressOfTokenUsedAsReward);
+        require(_rate > 0);
+        rate = _rate;
+        name = _name;
+        symbol = _symbol;
+        softcap = _softcap;
+        hardcap = _hardcap;
+        contractOwner = _contractOwner;
     }
 
-    function () payable {
-        if (completed) throw;
-        uint amount = msg.value;
-        balanceOf[msg.sender] = amount;
-        amountRaised += amount;
-        tokenReward.transfer(msg.sender, amount / price);
-        FundTransfer(msg.sender, amount, true);
+    // disable transfer
+    function transfer(address _to, uint _value) returns (bool) {
+        require(1==0);
     }
 
-    modifier afterDeadline() { if (now >= deadline) _; }
-
-    function checkGoalReached() afterDeadline {
-        if (amountRaised >= fundingGoal){
-            fundingGoalReached = true;
-            GoalReached(target_addr, amountRaised);
-        }
-        completed = true;
+    modifier canBuy() {
+        require(active);
+        _;
     }
 
-
-    function safeWithdrawal() afterDeadline {
-        if (!fundingGoalReached) {
-            uint amount = balanceOf[msg.sender];
-            balanceOf[msg.sender] = 0;
-            if (amount > 0) {
-                if (msg.sender.send(amount)) {
-                    FundTransfer(msg.sender, amount, false);
-                } else {
-                    balanceOf[msg.sender] = amount;
+    function finishIfNeed() {
+        if (now > deadline || totalSupply > hardcap) {
+            active = false;
+            if (totalSupply < softcap) {
+                for (uint i = 0; i < balancesForReturn.length; ++i) {
+                    balancesForReturn[i].addr.transfer(balancesForReturn[i].amount);
                 }
             }
+            suicide(contractOwner);
         }
+    }
 
-        if (fundingGoalReached && target_addr == msg.sender) {
-            if (target_addr.send(amountRaised)) {
-                FundTransfer(target_addr, amountRaised, false);
-            } else {
-                fundingGoalReached = false;
-            }
-        }
+   function () payable {
+       buyTokens(msg.sender);
+   }
+
+    function buyTokens(address beneficiary) canBuy payable {
+        
+        finishIfNeed();
+
+        require(beneficiary != 0x0);
+        require(msg.value > 0);
+        
+
+        uint256 weiAmount = msg.value;
+        uint256 tokens = weiAmount.mul(rate);
+
+        totalSupply = totalSupply.add(tokens);
+        balances[beneficiary] = balances[beneficiary].add(tokens);
+        balancesForReturn.push(Funder({addr: beneficiary, amount: tokens}));
     }
 }
