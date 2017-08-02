@@ -1,4 +1,4 @@
-            A smart contract for Lastwill Pre ICO
+   A smart contract for Lastwill Pre ICO
 
 This smart contract is intended for the WIL Presale ICO tokens (PRE WIL) issue. 
 Please read the rules & terms before working with the contract:
@@ -10,6 +10,8 @@ Please read the rules & terms before working with the contract:
  • The maximum number of tokens distributed during Presale ICO is limited to 6.000.000 PRE WIL;
  
  • The development team can terminate the Presale ICO at any time;
+ 
+ • Presale token contract must conform to ERC20 spec.
  
  • PRE WIL is not transferable;
  
