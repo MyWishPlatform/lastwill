@@ -1,9 +1,9 @@
    A smart contract for Lastwill Pre ICO
 
-This smart contract is intended for the WIL Presale ICO tokens (PRE WIL) issue. 
+This smart contract is intended for the WIL Presale ICO tokens (PRL token) issue. 
 Please read the rules & terms before working with the contract:
 
- • During the Presale ICO, tokens have fixed price: 4.000 PRE WIL for 1 ETH;
+ • During the Presale ICO, tokens have fixed price: 4.000 PRL for 1 ETH;
  
  • Discount (100%) is already included to the cost;
  
@@ -13,9 +13,9 @@ Please read the rules & terms before working with the contract:
  
  • Presale token contract must conform to ERC20 spec.
  
- • PRE WIL is not transferable;
+ • PRL tokens is not transferable;
  
- • PRE WIL tokens will be exchanged by LastWill tokens before ICO start;
+ • PRL tokens will be exchanged by LastWill tokens before ICO start;
  
  • If by 09:00 AM (CST) on August 17, 2017 will be sold less than 2,000,000 coins, then the invested funds will be returned to investors;
  
