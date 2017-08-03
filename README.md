@@ -15,7 +15,7 @@ Please read the rules & terms before working with the contract:
  
  • PRE WIL is not transferable;
  
- • PRE WIL tokens will be exchanged by LastWill before ICO start;
+ • PRE WIL tokens will be exchanged by LastWill tokens before ICO start;
  
  • If by 09:00 AM (CST) on August 17, 2017 will be sold less than 2,000,000 coins, then the invested funds will be returned to investors;
  
