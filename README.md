@@ -7,9 +7,9 @@ Please read the rules & terms before working with the contract:
  
  • Discount (100%) is already included to the cost;
  
- • The maximum number of tokens distributed during Presale ICO is limited to 6.000.000 PRE WIL;
+ • The number of tokens distributed during the Presale ICO contract is unlimited;
  
- • The development team can terminate the Presale ICO at any time;
+ • The development team can terminate Presale ICO anytime before 09:00 AM (CST) on August 17,2017;
  
  • Presale token contract must conform to ERC20 spec.
  
