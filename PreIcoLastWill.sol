@@ -97,4 +97,3 @@ contract PreICOLastWillToken is BasicToken, Ownable {
         balancesForReturn.push(Funder({addr: beneficiary, amount: tokens}));
     }
 }
-
