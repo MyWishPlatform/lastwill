@@ -25,7 +25,7 @@ contract LastWillContract {
         assert(_recipients.length == _percents.length);
         uint8 summaryPercent = 0;
         for (uint i = 0; i < _recipients.length; i ++) {
-            assert(_percents[i] < 0);
+            assert(_percents[i] > 0);
             recipientPercents.push(RecipientPercent(_recipients[i], _percents[i]));
             summaryPercent += _percents[i];
         }
