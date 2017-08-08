@@ -22,6 +22,7 @@ contract LastWillContract {
     function LastWillContract(address _targetUser, address[] _recipients, uint8[] _percents) {
         targetUser = _targetUser;
         lastWillAccount = msg.sender;
+        assert(_recipients.length != 0);
         assert(_recipients.length == _percents.length);
         uint8 summaryPercent = 0;
         for (uint i = 0; i < _recipients.length; i ++) {
@@ -85,7 +86,7 @@ contract LastWillContract {
     // ------------ FALLBACK -------------
     // Must be less then 2300 gas
     function() payable {
-        FundsAdded(msg.sender, msg.value);
+//        FundsAdded(msg.sender, msg.value);
     }
 
     // ------------ INTERNAL -------------
