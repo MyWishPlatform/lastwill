@@ -1,3 +1,6 @@
+// Attention, you have generated the demo version contract of Lastwill.
+// Please do not place it in the blockchain as the service has not been fully implemented yet and the team of Lastwill can not guarantee its correct operation.
+
 pragma solidity ^0.4.0;
 
 contract LastWillContract {
