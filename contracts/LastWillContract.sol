@@ -2,13 +2,8 @@ pragma solidity ^0.4.0;
 
 contract LastWillContract {
     struct RecipientPercent {
-    address recipient;
-    uint8 percent;
-    }
-
-    struct RecipientAmount {
-    address recipient;
-    uint amount;
+        address recipient;
+        uint8 percent;
     }
 
     // User which received all the ETH on kill or accident.
@@ -42,6 +37,8 @@ contract LastWillContract {
     event FundsSent(address recipient, uint amount, uint8 percent);
     // Occurs when accident leads to sending funds to recipient.
     event FundsChange(uint change);
+    // To inform LastWill system that check was finished.
+    event Checked(bool isAccident);
 
     // ------------ EXTERNAL API ----------
     // Kill contract and return all founds to the target user.
@@ -99,6 +96,9 @@ contract LastWillContract {
 
         for (uint i = 0; i < recipientPercents.length; i ++) {
             var amount = amounts[i];
+            if (amount == 0) {
+                continue;
+            }
             recipientPercents[i].recipient.transfer(amount);
             FundsSent(recipientPercents[i].recipient, amount, recipientPercents[i].percent);
         }
