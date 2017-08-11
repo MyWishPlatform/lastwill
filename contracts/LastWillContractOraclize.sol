@@ -56,8 +56,9 @@ contract LastWillContractOraclize is LastWillContract, usingOraclize {
 
     // The result look like '["1469624867", "1469624584",...'
     function __callback(bytes32 queryId, string result) {
-        if (!validIds[queryId]) revert();
+        if (accidentOccurs) return;
         if (msg.sender != oraclize_cbAddress()) revert();
+        if (!validIds[queryId]) revert();
         delete validIds[queryId];
         // empty string means not transaction timestamps (no output transaction)
         if (bytes(result).length == 0) {
