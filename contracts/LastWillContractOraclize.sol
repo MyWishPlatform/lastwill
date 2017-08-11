@@ -24,8 +24,6 @@ contract LastWillContractOraclize is LastWillContract, usingOraclize {
     mapping(bytes32 => bool) internal validIds;
     bool internal accidentOccurs = false;
 
-    uint constant ORACLIZE_MIN_PRICE = 0;
-
     // ------------ CONSTRUCT -------------
     function LastWillContractOraclize(address _targetUser, address[] _recipients, uint8[] _percents, uint _checkInterval)
     LastWillContract(_targetUser, _recipients, _percents) {
@@ -37,17 +35,22 @@ contract LastWillContractOraclize is LastWillContract, usingOraclize {
     // ------------ INTERNAL --------------
     function doCheck() onlyAdmin internal returns (bool) {
         if (accidentOccurs) {
+            msg.sender.transfer(msg.value);
             return true;
         }
         uint price = oraclize_getPrice("URL");
-        LowPrice(price);
-        if (price < ORACLIZE_MIN_PRICE) {
+        if (price > msg.value) {
             revert();
         }
         string memory url = buildUrl(targetUser, lastCheckBlockNo, block.number);
         bytes32 queryId = oraclize_query("URL", url);
         validIds[queryId] = true;
         CheckStarted(queryId);
+
+        uint change = msg.value - price;
+        if (change > 0) {
+            msg.sender.transfer(change);
+        }
         return false;
     }
 

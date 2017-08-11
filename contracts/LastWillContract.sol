@@ -47,7 +47,7 @@ contract LastWillContract {
         selfdestruct(targetUser);
     }
 
-    function check() onlyAdmin public {
+    function check() onlyAdmin payable public {
         if (doCheck()) {
             Accident(this.balance);
             accident();
