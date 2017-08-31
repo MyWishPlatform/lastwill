@@ -58,11 +58,15 @@ contract LastWillContractOraclize is LastWillContract, usingOraclize {
             return true;
         }
         uint price = oraclize_getPrice("URL");
+        Price(price);
         if (price > msg.value) {
             revert();
         }
         string memory url = buildUrl(targetUser, lastCheckBlockNo, block.number);
         bytes32 queryId = oraclize_query("URL", url);
+        if (queryId == 0) {
+            revert();
+        }
         validIds[queryId] = true;
 
         uint change = msg.value - price;

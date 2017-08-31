@@ -21,7 +21,7 @@ contract LastWillContract is SoftDestruct {
     bool private triggered = false;
 
     // ------------ CONSTRUCT -------------
-    function LastWillContract(address _targetUser, address[] _recipients, uint8[] _percents)
+    function LastWillContract(address _targetUser, address[] storage _recipients, uint8[] storage _percents)
              SoftDestruct(_targetUser) {
         assert(_recipients.length == _percents.length);
         // check percents
@@ -104,7 +104,7 @@ contract LastWillContract is SoftDestruct {
      *
      * @return bool true of accident triggered, flase otherwise.
      */
-    function internalCheck() internal returns (bool);
+    function internalCheck() internal returns (bool) {}
 
     /**
      * Extends super method to add event producing.
