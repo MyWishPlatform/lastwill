@@ -10,11 +10,12 @@ contract SoftDestruct {
     address public targetUser;
 
     /**
-     * Flag that the contract is already destroyed.
+     * Flag means that this contract is already destroyed.
      */
-    bool public destroyed = false;
+    bool private destroyed = false;
 
     function SoftDestruct(address _targetUser) {
+        assert(_targetUser != 0x0);
         targetUser = _targetUser;
     }
 
@@ -23,6 +24,9 @@ contract SoftDestruct {
      */
     function kill() public onlyTarget() onlyAlive() {
         destroyed = true;
+        if (this.balance == 0) {
+            return;
+        }
         targetUser.transfer(this.balance);
     }
 
@@ -33,6 +37,10 @@ contract SoftDestruct {
 
     function isTarget() internal constant returns (bool) {
         return targetUser == msg.sender;
+    }
+
+    function isDestroyed() internal constant returns (bool) {
+        return destroyed;
     }
 
     // ------------ MODIFIERS -----------

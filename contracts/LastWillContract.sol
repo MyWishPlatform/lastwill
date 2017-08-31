@@ -1,29 +1,40 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.16;
 
-contract LastWillContract {
-    struct RecipientPercent {
-        address recipient;
-        uint8 percent;
-    }
+import "SoftDestruct.sol";
 
-    // User which received all the ETH on kill or accident.
-    address public targetUser;
-    // Last will admin account.
-    address public lastWillAccount;
-    // How many amount of contract's balance will be payed to recipients when accident occurs.
-    RecipientPercent[] public recipientPercents;
+/**
+ * The base LastWill contract. Check method must be overrided.
+ */
+contract LastWillContract is SoftDestruct {
+    /**
+     * LastWill service admin account.
+     */
+    address private lastWillAccount;
+    /**
+     * Linked arrays: recipient addresses and corresponding % of funds.
+     */
+    address[] public recipients;
+    uint8[] public percents;
+    /**
+     * Flag means that contract accident already occurs.
+     */
+    bool private triggered = false;
 
     // ------------ CONSTRUCT -------------
-    function LastWillContract(address _targetUser, address[] _recipients, uint8[] _percents) {
-        targetUser = _targetUser;
-        lastWillAccount = msg.sender;
+    function LastWillContract(address _targetUser, address[] _recipients, uint8[] _percents)
+             SoftDestruct(_targetUser) {
         assert(_recipients.length == _percents.length);
+        // check percents
         uint8 summaryPercent = 0;
         for (uint i = 0; i < _recipients.length; i ++) {
-            recipientPercents.push(RecipientPercent(_recipients[i], _percents[i]));
+            assert(_recipients[i] != 0x0);
             summaryPercent += _percents[i];
         }
         assert(summaryPercent == 100);
+
+        lastWillAccount = msg.sender;
+        recipients = _recipients;
+        percents = _percents;
     }
 
     // ------------ EVENTS ----------------
@@ -32,92 +43,75 @@ contract LastWillContract {
     // Occurs when founds were sent.
     event FundsAdded(address indexed from, uint amount);
     // Occurs when accident happened.
-    event Accident(uint balance);
+    event Triggered(uint balance);
     // Occurs when accident leads to sending funds to recipient.
     event FundsSent(address recipient, uint amount, uint8 percent);
-    // Occurs when accident leads to sending funds to recipient.
-    event FundsChange(uint change);
-    // To inform LastWill system that check was finished.
-    event Checked(bool isAccident);
 
-    // ------------ EXTERNAL API ----------
-    // Kill contract and return all founds to the target user.
-    function kill() onlyTargetOrAdmin public {
-        Killed(isTarget());
-        selfdestruct(targetUser);
-    }
-
-    function check() onlyAdmin payable public {
-        if (doCheck()) {
-            Accident(this.balance);
-            accident();
+    /**
+     * Public check method.
+     */
+    function check() onlyAdmin() onlyAlive() notTriggered() payable public {
+        if (internalCheck()) {
+            Triggered(this.balance);
+            triggered = true;
+            distributeFunds();
         }
-    }
-    // for debug purposes only!
-    function testDistribute(uint balance, address[] recipients, uint8[] percents) {
-        assert(recipients.length == percents.length);
-        RecipientPercent[] memory rp = new RecipientPercent[](recipients.length);
-        for (uint i = 0; i < recipients.length; i ++) {
-            rp[i].recipient = recipients[i];
-            rp[i].percent = percents[i];
-        }
-        uint[] memory amounts = new uint[](recipients.length);
-        uint change = distribute(balance, rp, amounts);
-
-        for (uint m = 0; m < amounts.length; m ++) {
-            FundsSent(recipients[m], amounts[m], percents[m]);
-        }
-        FundsChange(change);
     }
 
     // ------------ FALLBACK -------------
     // Must be less then 2300 gas
-    function() payable {
+    function() payable onlyAlive() notTriggered() {
         FundsAdded(msg.sender, msg.value);
     }
 
     // ------------ INTERNAL -------------
-    // Internal constant method for calculating payments.
-    function distribute(uint balance, RecipientPercent[] percents, uint[] amounts) internal constant
-    returns (uint change) {
-        assert(amounts.length == percents.length);
+    /**
+     * Calculate amounts to transfer corresponding to the percents.
+     */
+    function calculateAmounts(uint balance, uint[] amounts) internal constant
+                    returns (uint change) {
         change = balance;
         for (uint i = 0; i < percents.length; i ++) {
-            var amount = balance * percents[i].percent / 100;
+            var amount = balance * percents[i] / 100;
             amounts[i] = amount;
             change -= amount;
         }
     }
 
-    // Do accident logic - transfer found and destruct contract.
-    function accident() internal {
-        uint[] memory amounts = new uint[](recipientPercents.length);
-        uint change = distribute(this.balance, recipientPercents, amounts);
+    /**
+     * Distribute funds between recipients in corresponding by percents.
+     */
+    function distributeFunds() internal {
+        uint[] memory amounts = new uint[](recipients.length);
+        uint change = calculateAmounts(this.balance, amounts);
 
-        for (uint i = 0; i < recipientPercents.length; i ++) {
+        for (uint i = 0; i < amounts.length; i ++) {
             var amount = amounts[i];
+            var recipient = recipients[i];
+            var percent = percents[i];
+
             if (amount == 0) {
                 continue;
             }
-            recipientPercents[i].recipient.transfer(amount);
-            FundsSent(recipientPercents[i].recipient, amount, recipientPercents[i].percent);
+
+            recipient.transfer(amount + change);
+            FundsSent(recipient, amount, percent);
         }
-
-        FundsChange(change);
-        selfdestruct(targetUser);
     }
 
-    function doCheck() internal returns (bool);
+    /**
+     * Do inner check.
+     *
+     * @return bool true of accident triggered, flase otherwise.
+     */
+    function internalCheck() internal returns (bool);
 
-    function isTarget() internal constant returns (bool) {
-        return targetUser == msg.sender;
-    }
-
-
-    // ------------ MODIFIERS -----------
-    modifier onlyTarget() {
-        require(isTarget());
-        _;
+    /**
+     * Extends super method to add event producing.
+     */
+    function kill() public {
+        super.kill();
+        Killed(true);
     }
 
     modifier onlyAdmin() {
@@ -126,8 +120,12 @@ contract LastWillContract {
     }
 
     modifier onlyTargetOrAdmin() {
-        require(targetUser == msg.sender || lastWillAccount == msg.sender);
+        require(isTarget() || lastWillAccount == msg.sender);
         _;
     }
 
+    modifier notTriggered() {
+        require(!triggered);
+        _;
+    }
 }
