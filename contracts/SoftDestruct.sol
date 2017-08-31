@@ -1,4 +1,4 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.16;
 
 /**
  * Base logic for "soft" destruct contract. In other words - to return funds to the target user.

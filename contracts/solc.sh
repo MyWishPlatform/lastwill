@@ -1,0 +1,1 @@
+solc --bin --abi --ast --gas -o target LastWillContractOraclize.sol
