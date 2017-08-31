@@ -107,9 +107,7 @@ contract LastWillContractOraclize is LastWillContract, usingOraclize {
         return parseInt(ts);
     }
 
-    /**
-     * json(https://api.etherscan.io/api?module=account&action=txlist&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&startblock=0&endblock=99999999&page=0&offset=0&sort=desc&apikey=FJ39P2DIU8IX8U9N2735SUKQWG3HPPGPX8).result[?(@.from=='<address>')].timeStamp
-     */
+    // json(https://api.etherscan.io/api?module=account&action=txlist&address=0xddbd2b932c763ba5b1b7ae3b362eac3e8d40121a&startblock=0&endblock=99999999&page=0&offset=0&sort=desc&apikey=FJ39P2DIU8IX8U9N2735SUKQWG3HPPGPX8).result[?(@.from=='<address>')].timeStamp
     function buildUrl(address target, uint startBlock, uint endBlock) internal returns (string) {
         strings.slice memory strAddress = toHex(target).toSlice();
         uint8 i = 0; // count of the strings below
