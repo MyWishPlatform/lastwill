@@ -5,7 +5,7 @@ import "SoftDestruct.sol";
 /**
  * The base LastWill contract. Check method must be overrided.
  */
-contract LastWillContract is SoftDestruct {
+contract LastWill is SoftDestruct {
     /**
      * LastWill service admin account.
      */
@@ -21,7 +21,7 @@ contract LastWillContract is SoftDestruct {
     bool private triggered = false;
 
     // ------------ CONSTRUCT -------------
-    function LastWillContract(address _targetUser, address[] storage _recipients, uint8[] storage _percents)
+    function LastWill(address _targetUser, address[] _recipients, uint8[] _percents)
              SoftDestruct(_targetUser) {
         assert(_recipients.length == _percents.length);
         // check percents
