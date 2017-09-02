@@ -55,7 +55,7 @@ contract LastWillOraclize is LastWill {
         if (price > msg.value) {
             revert();
         }
-        if (!proxy.query(targetUser, lastCheckBlockNo, block.number, this.callback)) {
+        if (!proxy.query.value(price)(targetUser, lastCheckBlockNo, block.number, this.callback)) {
             revert();
         }
 

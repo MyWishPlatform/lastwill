@@ -6,15 +6,18 @@ import "SoftDestruct.sol";
  * The base LastWill contract. Check method must be overrided.
  */
 contract LastWill is SoftDestruct {
+    struct RecipientPercent {
+        address recipient;
+        uint8 percent;
+    }
+    /**
+     * Recipient addresses and corresponding % of funds.
+     */
+    RecipientPercent[] private percents;
     /**
      * LastWill service admin account.
      */
     address private lastWillAccount;
-    /**
-     * Linked arrays: recipient addresses and corresponding % of funds.
-     */
-    address[] public recipients;
-    uint8[] public percents;
     /**
      * Flag means that contract accident already occurs.
      */
@@ -24,17 +27,20 @@ contract LastWill is SoftDestruct {
     function LastWill(address _targetUser, address[] _recipients, uint8[] _percents)
              SoftDestruct(_targetUser) {
         assert(_recipients.length == _percents.length);
+        percents.length = _recipients.length;
         // check percents
         uint8 summaryPercent = 0;
         for (uint i = 0; i < _recipients.length; i ++) {
-            assert(_recipients[i] != 0x0);
-            summaryPercent += _percents[i];
+            address recipient = _recipients[i];
+            uint8 percent = _percents[i];
+
+            assert(recipient != 0x0);
+            summaryPercent += percent;
+            percents[i] = RecipientPercent(recipient,percent);
         }
         assert(summaryPercent == 100);
 
         lastWillAccount = msg.sender;
-        recipients = _recipients;
-        percents = _percents;
     }
 
     // ------------ EVENTS ----------------
@@ -72,7 +78,7 @@ contract LastWill is SoftDestruct {
                     returns (uint change) {
         change = balance;
         for (uint i = 0; i < percents.length; i ++) {
-            var amount = balance * percents[i] / 100;
+            var amount = balance * percents[i].percent / 100;
             amounts[i] = amount;
             change -= amount;
         }
@@ -82,13 +88,13 @@ contract LastWill is SoftDestruct {
      * Distribute funds between recipients in corresponding by percents.
      */
     function distributeFunds() internal {
-        uint[] memory amounts = new uint[](recipients.length);
+        uint[] memory amounts = new uint[](percents.length);
         uint change = calculateAmounts(this.balance, amounts);
 
         for (uint i = 0; i < amounts.length; i ++) {
             var amount = amounts[i];
-            var recipient = recipients[i];
-            var percent = percents[i];
+            var recipient = percents[i].recipient;
+            var percent = percents[i].percent;
 
             if (amount == 0) {
                 continue;

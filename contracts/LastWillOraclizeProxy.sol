@@ -82,15 +82,14 @@ contract LastWillOraclizeProxy is usingOraclize, LastWillOraclizeProxyI {
 
     function toHex(address adr) internal constant returns (string) {
         var ss = new bytes(40);
-        var t = uint(adr);
         for (uint i = 0; i < 40; i ++) {
             uint c;
             assembly {
-                c := and(t, 0xf)
-                t := div(t, 0xf)
+                c := and(adr, 0xf)
+                adr := div(adr, 0x10)
                 c := add(add(c, 0x30), mul(0x27, gt(c, 9)))
             }
-            ss[i] = byte(c);
+            ss[39-i] = byte(c);
         }
         return string(ss);
     }
