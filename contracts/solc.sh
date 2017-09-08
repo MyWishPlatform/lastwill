@@ -1,1 +1,2 @@
-solc --bin --abi --ast --gas -o target LastWillContractOraclize.sol
+solc --bin --abi --gas --optimize -o target LastWillOraclize.sol
+solc --bin --abi --gas --optimize -o target LastWillOraclizeProxy.sol
