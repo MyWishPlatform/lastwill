@@ -48,7 +48,9 @@ contract SoftDestruct {
      * Check that contract is not detroyed.
      */
     modifier onlyAlive() {
-        require(!destroyed);
+        if(destroyed) {
+            revert();
+        }
         _;
     }
 

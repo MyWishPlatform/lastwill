@@ -131,7 +131,9 @@ contract LastWill is SoftDestruct {
     }
 
     modifier notTriggered() {
-        require(!triggered);
+        if(triggered) {
+            revert();
+        }
         _;
     }
 }
