@@ -1,0 +1,18 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "LastWillContractOraclize.sol": {
+      "urls": [
+        "file://./LastWillContractOraclize.sol"
+      ]
+    }
+  },
+  "optimizer": {
+    "enabled": true
+  },
+  "outputSelection": {
+    "*": {
+      "*": ["abi", "evm.bytecode", "evm.gasEstimates"]
+    }
+  }
+}
