@@ -4,15 +4,15 @@ import "./MyWillToken.sol";
 import "./zeppelin/crowdsale/RefundableCrowdsale.sol";
 
 contract MyWillCrowdsale is RefundableCrowdsale {
-    uint constant step_30 = 20000000 * 10 ^ 18;
-    uint constant step_20 = 40000000 * 10 ^ 18;
-    uint constant step_10 = 60000000 * 10 ^ 18;
+    uint constant step_30 = 20000000 * 10 ** 18;
+    uint constant step_20 = 40000000 * 10 ** 18;
+    uint constant step_10 = 60000000 * 10 ** 18;
     uint16 constant rate_30 = 1950;
     uint16 constant rate_20 = 1800;
     uint16 constant rate_10 = 1650;
 
-    uint constant teamTokens = 11000000 * 10 ^ 18;
-    uint constant bountyTokens = 2000000 * 10 ^ 18;
+    uint constant teamTokens = 11000000 * 10 ** 18;
+    uint constant bountyTokens = 2000000 * 10 ** 18;
     address constant teamAddress = 0x1;
     address constant bountyAddress = 0x2;
 
@@ -54,13 +54,13 @@ contract MyWillCrowdsale is RefundableCrowdsale {
         }
 
         // apply bonus for amount
-        if (value >= 5000 * 10 ^ 18) {
+        if (value >= 5000 * 10 ** 18) {
             baseRate += 50;
         }
-        else if (value >= 3000 * 10 ^ 18) {
+        else if (value >= 3000 * 10 ** 18) {
             baseRate += 30;
         }
-        else if (value >= 1000 * 10 ^ 18) {
+        else if (value >= 1000 * 10 ** 18) {
             baseRate += 10;
         }
         return baseRate;
