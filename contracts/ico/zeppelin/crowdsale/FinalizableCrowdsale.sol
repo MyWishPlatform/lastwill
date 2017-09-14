@@ -18,6 +18,10 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
 
     event Finalized();
 
+    function FinalizableCrowdsale(uint32 _startTime, uint32 _endTime, uint _rate, uint _hardCap, address _wallet)
+            Crowdsale(_startTime, _endTime, _rate, _hardCap, _wallet) {
+    }
+
     /**
      * @dev Must be called after crowdsale ends, to do some extra finalization
      * work. Calls the contract's finalization function.

@@ -34,6 +34,11 @@ contract Crowdsale {
     uint public weiRaised;
 
     /**
+     * @dev Maximum amount of tokens to mint.
+     */
+    uint public hardCap;
+
+    /**
      * event for token purchase logging
      * @param purchaser who paid for the tokens
      * @param beneficiary who got the tokens
@@ -43,16 +48,18 @@ contract Crowdsale {
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint value, uint amount);
 
 
-    function Crowdsale(uint _startTime, uint _endTime, uint _rate, address _wallet) {
+    function Crowdsale(uint32 _startTime, uint32 _endTime, uint _rate, uint _hardCap, address _wallet) {
         require(_startTime >= now);
         require(_endTime >= _startTime);
         require(_rate > 0);
         require(_wallet != 0x0);
+        require(_hardCap > _rate);
 
         token = createTokenContract();
         startTime = _startTime;
         endTime = _endTime;
         rate = _rate;
+        hardCap = _hardCap;
         wallet = _wallet;
     }
 
@@ -62,48 +69,94 @@ contract Crowdsale {
         return new MintableToken();
     }
 
+    /**
+     * @dev this method might be overridden for implementing any sale logic.
+     * @return Actual rate.
+     */
+    function getRate(uint amount) internal constant returns (uint) {
+        return rate;
+    }
 
     // fallback function can be used to buy tokens
     function() payable {
-        buyTokens(msg.sender);
+        buyTokens(msg.sender, msg.value);
     }
 
     // low level token purchase function
-    function buyTokens(address beneficiary) internal {
+    function buyTokens(address beneficiary, uint amountWei) internal {
         require(beneficiary != 0x0);
-        require(validPurchase());
 
-        uint weiAmount = msg.value;
+        // total minted tokens
+        uint totalSupply = token.totalSupply();
+
+        // actual token minting rate (with considering bonuses and discounts)
+        uint actualRate = getRate(amountWei);
+
+        require(validPurchase(amountWei, actualRate, totalSupply));
 
         // calculate token amount to be created
-        uint tokens = weiAmount.mul(rate);
+        uint tokens = amountWei.mul(actualRate);
+
+        // change, if minted token would be less
+        uint change = 0;
+
+        // if hard cap reached
+        if (tokens.add(totalSupply) > hardCap) {
+            // rest tokens
+            tokens = hardCap.sub(totalSupply);
+            uint realAmount = tokens.div(actualRate);
+            // rest tokens rounded by actualRate
+            tokens = realAmount.mul(actualRate);
+            change = amountWei - realAmount;
+
+            amountWei = realAmount;
+        }
 
         // update state
-        weiRaised = weiRaised.add(weiAmount);
+        weiRaised = weiRaised.add(amountWei);
 
         token.mint(beneficiary, tokens);
-        TokenPurchase(msg.sender, beneficiary, weiAmount, tokens);
+        TokenPurchase(msg.sender, beneficiary, amountWei, tokens);
 
-        forwardFunds();
+        if (change != 0) {
+            msg.sender.transfer(change);
+        }
+        forwardFunds(amountWei);
     }
 
     // send ether to the fund collection wallet
     // override to create custom fund forwarding mechanisms
-    function forwardFunds() internal {
-        wallet.transfer(msg.value);
+    function forwardFunds(uint amountWei) internal {
+        wallet.transfer(amountWei);
     }
 
-    // @return true if the transaction can buy tokens
-    function validPurchase() internal constant returns (bool) {
+    /**
+     * @dev Check if the specified purchase is valid.
+     * @return true if the transaction can buy tokens
+     */
+    function validPurchase(uint _amountWei, uint _actualRate, uint _totalSupply) internal constant returns (bool) {
         bool withinPeriod = now >= startTime && now <= endTime;
-        bool nonZeroPurchase = msg.value != 0;
-        return withinPeriod && nonZeroPurchase;
+        bool nonZeroPurchase = _amountWei != 0;
+        bool hardCapNotReached = _totalSupply <= hardCap.sub(_actualRate);
+
+        return withinPeriod && nonZeroPurchase && hardCapNotReached;
     }
 
-    // @return true if crowdsale event has ended
+    /**
+     * @dev Because of discount hasEnded might be true, but validPurchase returns false.
+     * @return true if crowdsale event has ended
+     */
     function hasEnded() public constant returns (bool) {
-        return now > endTime;
+        return now > endTime || token.totalSupply() > hardCap.sub(rate);
     }
 
-
+    /**
+     * @dev Check this crowdsale event has ended considering with amount to buy.
+     * @param _value Amount to spend.
+     * @return true if crowdsale event has ended
+     */
+    function hasEnded(uint _value) public constant returns (bool) {
+        uint actualRate = getRate(_value);
+        return now > endTime || token.totalSupply() > hardCap.sub(actualRate);
+    }
 }
