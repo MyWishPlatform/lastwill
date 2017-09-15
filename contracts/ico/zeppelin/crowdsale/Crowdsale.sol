@@ -34,6 +34,11 @@ contract Crowdsale {
     uint public weiRaised;
 
     /**
+     * @dev Amount of already sold tokens.
+     */
+    uint public soldTokens;
+
+    /**
      * @dev Maximum amount of tokens to mint.
      */
     uint public hardCap;
@@ -114,6 +119,7 @@ contract Crowdsale {
 
         // update state
         weiRaised = weiRaised.add(amountWei);
+        soldTokens = soldTokens.add(tokens);
 
         token.mint(beneficiary, tokens);
         TokenPurchase(msg.sender, beneficiary, amountWei, tokens);

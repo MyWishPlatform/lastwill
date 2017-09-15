@@ -39,16 +39,15 @@ contract MyWillCrowdsale is RefundableCrowdsale {
     }
 
     function getRate(uint value) internal constant returns (uint) {
-        uint totalSupply = token.totalSupply();
         uint baseRate;
         // apply sale
-        if (totalSupply < step_30) {
+        if (soldTokens < step_30) {
             baseRate = rate_30;
         }
-        else if (totalSupply < step_20) {
+        else if (soldTokens < step_20) {
             baseRate = rate_20;
         }
-        else if (totalSupply < step_10) {
+        else if (soldTokens < step_10) {
             baseRate = rate_10;
         }
         else {
