@@ -27,7 +27,9 @@ contract MyWillCrowdsale is RefundableCrowdsale {
         token.mint(teamAddress,  teamTokens);
         token.mint(bountyAddress, bountyTokens);
 
-        rateProvider = new MyWillRateProvider();
+        MyWillRateProvider provider = new MyWillRateProvider();
+        provider.transferOwnership(owner);
+        rateProvider = provider;
 
         // pre ICO
     }
@@ -36,12 +38,12 @@ contract MyWillCrowdsale is RefundableCrowdsale {
         return new MyWillToken();
     }
 
-    function getRate(uint value) internal constant returns (uint) {
-        return rateProvider.getRate(msg.sender, soldTokens, value);
+    function getRate(uint _value) internal constant returns (uint) {
+        return rateProvider.getRate(msg.sender, soldTokens, _value);
     }
 
-    function transferTokenOwnership(address newOwner) onlyOwner {
-        token.transferOwnership(newOwner);
+    function transferTokenOwnership(address _newOwner) onlyOwner {
+        token.transferOwnership(_newOwner);
     }
 
     function setRateProvider(address _rateProviderAddress) onlyOwner {
