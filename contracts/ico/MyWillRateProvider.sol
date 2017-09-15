@@ -1,5 +1,6 @@
 pragma solidity ^0.4.16;
 
+import "./MyWillConsts.sol";
 import "./zeppelin/ownership/Ownable.sol";
 
 contract MyWillRateProviderI {
@@ -13,9 +14,7 @@ contract MyWillRateProviderI {
     function getRate(address buyer, uint totalSold, uint amountWei) returns (uint rate);
 }
 
-contract MyWillRateProvider is MyWillRateProviderI, Ownable {
-    uint constant tokenDecimal = 18;
-    uint constant tokenDecimalMultiplier = 10 ** tokenDecimal;
+contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
     uint constant step_30 = 20000000 * tokenDecimalMultiplier;
     uint constant step_20 = 40000000 * tokenDecimalMultiplier;
     uint constant step_10 = 60000000 * tokenDecimalMultiplier;

@@ -1,12 +1,11 @@
 pragma solidity ^0.4.16;
 
 import "./MyWillToken.sol";
+import "./MyWillConsts.sol";
 import "./MyWillRateProvider.sol";
 import "./zeppelin/crowdsale/RefundableCrowdsale.sol";
 
-contract MyWillCrowdsale is RefundableCrowdsale {
-    uint constant tokenDecimal = 18;
-    uint constant tokenDecimalMultiplier = 10 ** tokenDecimal;
+contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
     uint constant teamTokens = 11000000 * tokenDecimalMultiplier;
     uint constant bountyTokens = 2000000 * tokenDecimalMultiplier;
     address constant teamAddress = 0x1;

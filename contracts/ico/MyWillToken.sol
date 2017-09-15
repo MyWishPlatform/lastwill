@@ -1,10 +1,9 @@
 pragma solidity ^0.4.16;
 
-
+import "./MyWillConsts.sol";
 import "./zeppelin/token/MintableToken.sol";
 
-
-contract MyWillToken is MintableToken {
+contract MyWillToken is usingMyWillConsts, MintableToken {
     bool public paused = false;
 
     function name() constant public returns (string _name) {
@@ -16,7 +15,7 @@ contract MyWillToken is MintableToken {
     }
 
     function decimals() constant public returns (uint8 _decimals) {
-        return 18;
+        return tokenDecimals8;
     }
 
     function setPaused(bool _paused) onlyOwner {
