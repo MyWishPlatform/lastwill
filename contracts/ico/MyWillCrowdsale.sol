@@ -24,7 +24,7 @@ contract MyWillCrowdsale is RefundableCrowdsale {
             uint _softCap,
             uint _hardCap
     )
-        RefundableCrowdsale(_startTime, _endTime, _rate, _hardCap, _wallet, _softCap) {
+        RefundableCrowdsale(_startTime, _endTime, _rate, _hardCap * 10 ** 18, _wallet, _softCap * 10 ** 18) {
 
         token.mint(teamAddress,  teamTokens);
         token.mint(bountyAddress, bountyTokens);
@@ -64,5 +64,9 @@ contract MyWillCrowdsale is RefundableCrowdsale {
             baseRate += 10;
         }
         return baseRate;
+    }
+
+    function transferTokenOwnership(address newOwner) onlyOwner {
+        token.transferOwnership(newOwner);
     }
 }
