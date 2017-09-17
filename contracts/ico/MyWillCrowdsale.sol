@@ -19,12 +19,11 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
     function MyWillCrowdsale(
             uint32 _startTime,
             uint32 _endTime,
-            uint _rate,
             address _wallet,
             uint _softCapWei,
             uint _hardCapTokens
     )
-        RefundableCrowdsale(_startTime, _endTime, _rate, _hardCapTokens * TOKEN_DECIMAL_MULTIPLIER, _wallet, _softCapWei) {
+        RefundableCrowdsale(_startTime, _endTime, 1500, _hardCapTokens * TOKEN_DECIMAL_MULTIPLIER, _wallet, _softCapWei) {
 
         token.mint(teamAddress,  teamTokens);
         token.mint(bountyAddress, bountyTokens);
