@@ -9,10 +9,10 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
     uint constant teamTokens = 11000000 * tokenDecimalMultiplier;
     uint constant bountyTokens = 2000000 * tokenDecimalMultiplier;
     uint constant icoTokens = 3038800 * tokenDecimalMultiplier;
-    uint constant minimalPurchase = 50000000000000000;
-    address constant teamAddress = 0x1;
-    address constant bountyAddress = 0x2;
-    address constant icoAccountAddress = 0x3;
+    uint constant minimalPurchase = 0.05 ether;
+    address constant teamAddress = 0x001a041f7ABAb9871a22D2bEd0EC4dAb228866c3;
+    address constant bountyAddress = 0x0025ea8bBBB72199cf70FE25F92d3B298C3B162A;
+    address constant icoAccountAddress = 0x001a041f7ABAb9871a22D2bEd0EC4dAb228866c3;
 
     MyWillRateProviderI rateProvider;
 
@@ -29,6 +29,10 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
         token.mint(teamAddress,  teamTokens);
         token.mint(bountyAddress, bountyTokens);
         token.mint(icoAccountAddress, icoTokens);
+
+        MyWillToken(token).addExcluded(teamAddress);
+        MyWillToken(token).addExcluded(bountyAddress);
+        MyWillToken(token).addExcluded(icoAccountAddress);
 
         MyWillRateProvider provider = new MyWillRateProvider();
         provider.transferOwnership(owner);
@@ -66,7 +70,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
         if (!goalReached()) {
             return;
         }
-        MyWillToken(token).setPaused(false);
+        MyWillToken(token).crowdsaleFinished();
         token.transferOwnership(owner);
     }
 }
