@@ -58,14 +58,14 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
 
     // vault finalization task, called when owner calls finalize()
     function finalization() internal {
+        super.finalization();
+
         if (goalReached()) {
             vault.close();
         }
         else {
             vault.enableRefunds();
         }
-
-        super.finalization();
     }
 
     function goalReached() public constant returns (bool) {

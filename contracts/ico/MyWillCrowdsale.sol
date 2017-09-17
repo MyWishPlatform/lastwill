@@ -12,7 +12,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
     uint constant minimalPurchase = 0.005 ether;
     address constant teamAddress = 0x001a041f7ABAb9871a22D2bEd0EC4dAb228866c3;
     address constant bountyAddress = 0x0025ea8bBBB72199cf70FE25F92d3B298C3B162A;
-    address constant icoAccountAddress = 0x001a041f7ABAb9871a22D2bEd0EC4dAb228866c3;
+    address constant icoAccountAddress = 0x003b3f928c428525e9836C1d1b52016F4833c2f0;
 
     MyWillRateProviderI public rateProvider;
 
