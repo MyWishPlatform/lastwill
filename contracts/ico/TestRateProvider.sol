@@ -3,23 +3,13 @@ pragma solidity ^0.4.16;
 import './zeppelin/math/SafeMath.sol';
 import "./MyWillConsts.sol";
 import "./zeppelin/ownership/Ownable.sol";
+import "./MyWillRateProvider.sol";
 
-contract MyWillRateProviderI {
-    /**
-     * @dev Calculate actual rate using the specified parameters.
-     * @param buyer     Investor (buyer) address.
-     * @param totalSold Amount of sold tokens.
-     * @param amountWei Amount of wei to purchase.
-     * @return ETH to Token rate.
-     */
-    function getRate(address buyer, uint totalSold, uint amountWei) returns (uint rate);
-}
-
-contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
+contract TestRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
     using SafeMath for uint;
-    uint constant step_30 = 20000000 * tokenDecimalMultiplier;
-    uint constant step_20 = 40000000 * tokenDecimalMultiplier;
-    uint constant step_10 = 60000000 * tokenDecimalMultiplier;
+    uint constant step_30 = 2000000 * tokenDecimalMultiplier;
+    uint constant step_20 = 4000000 * tokenDecimalMultiplier;
+    uint constant step_10 = 6000000 * tokenDecimalMultiplier;
     uint16 constant rate_30 = 1950;
     uint16 constant rate_20 = 1800;
     uint16 constant rate_10 = 1650;
@@ -54,22 +44,22 @@ contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
         }
 
         // apply bonus for amount
-        if (amountWei >= 1000 ether) {
+        if (amountWei >= 1 ether) {
             baseRate += baseRate * 13 / 100;
         }
-        else if (amountWei >= 500 ether) {
+        else if (amountWei >= 0.5 ether) {
             baseRate += baseRate * 10 / 100;
         }
-        else if (amountWei >= 100 ether) {
+        else if (amountWei >= 0.1 ether) {
             baseRate += baseRate * 7 / 100;
         }
-        else if (amountWei >= 50 ether) {
+        else if (amountWei >= 0.05 ether) {
             baseRate += baseRate * 5 / 100;
         }
-        else if (amountWei >= 30 ether) {
+        else if (amountWei >= 0.03 ether) {
             baseRate += baseRate * 4 / 100;
         }
-        else if (amountWei >= 10 ether) {
+        else if (amountWei >= 0.01 ether) {
             baseRate += baseRate * 25 / 1000;
         }
 

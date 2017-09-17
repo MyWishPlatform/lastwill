@@ -67,6 +67,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
 
     function finalization() internal {
         super.finalization();
+        token.finishMinting();
         if (!goalReached()) {
             return;
         }
