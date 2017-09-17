@@ -32,15 +32,28 @@ contract RefundableCrowdsale is FinalizableCrowdsale {
     // In addition to sending the funds, we want to call
     // the RefundVault deposit function
     function forwardFunds(uint amountWei) internal {
-        vault.deposit.value(amountWei)(msg.sender);
+        if (goalReached()) {
+            wallet.transfer(amountWei);
+        }
+        else {
+            vault.deposit.value(amountWei)(msg.sender);
+        }
     }
 
     // if crowdsale is unsuccessful, investors can claim refunds here
-    function claimRefund() {
+    function claimRefund() public {
         require(isFinalized);
         require(!goalReached());
 
         vault.refund(msg.sender);
+    }
+
+    /**
+     * @dev Close vault only if goal was reached.
+     */
+    function closeVault() public onlyOwner {
+        require(goalReached());
+        vault.close();
     }
 
     // vault finalization task, called when owner calls finalize()

@@ -1,5 +1,6 @@
 pragma solidity ^0.4.16;
 
+import './zeppelin/math/SafeMath.sol';
 import "./MyWillConsts.sol";
 import "./zeppelin/ownership/Ownable.sol";
 
@@ -15,6 +16,7 @@ contract MyWillRateProviderI {
 }
 
 contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
+    using SafeMath for uint;
     uint constant step_30 = 20000000 * tokenDecimalMultiplier;
     uint constant step_20 = 40000000 * tokenDecimalMultiplier;
     uint constant step_10 = 60000000 * tokenDecimalMultiplier;
@@ -26,9 +28,9 @@ contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
         // be careful, accuracies this about 15 minutes
         uint32 workUntil;
         // exclusive rate or 0
-        uint16 rate;
+        uint rate;
         // additional rate or 0
-        uint16 additionalRate;
+        uint16 bonusPercent1000;
         // flag to check, that record exists
         bool exists;
     }
@@ -52,15 +54,23 @@ contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
         }
 
         // apply bonus for amount
-        // TODO
-        if (amountWei >= 5000 * tokenDecimalMultiplier) {
-            baseRate += 50;
+        if (amountWei >= 1000 * etherDecimalMultiplier) {
+            baseRate += baseRate * 13 / 100;
         }
-        else if (amountWei >= 3000 * tokenDecimalMultiplier) {
-            baseRate += 30;
+        else if (amountWei >= 500 * etherDecimalMultiplier) {
+            baseRate += baseRate * 10 / 100;
         }
-        else if (amountWei >= 1000 * tokenDecimalMultiplier) {
-            baseRate += 10;
+        else if (amountWei >= 100 * etherDecimalMultiplier) {
+            baseRate += baseRate * 7 / 100;
+        }
+        else if (amountWei >= 50 * etherDecimalMultiplier) {
+            baseRate += baseRate * 5 / 100;
+        }
+        else if (amountWei >= 30 * etherDecimalMultiplier) {
+            baseRate += baseRate * 4 / 100;
+        }
+        else if (amountWei >= 10 * etherDecimalMultiplier) {
+            baseRate += baseRate * 25 / 1000;
         }
 
         ExclusiveRate memory eRate = exclusiveRate[buyer];
@@ -68,13 +78,13 @@ contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
             if (eRate.rate != 0) {
                 baseRate = eRate.rate;
             }
-            baseRate += eRate.additionalRate;
+            baseRate += baseRate * eRate.bonusPercent1000 / 1000;
         }
         return baseRate;
     }
 
-    function setExclusiveRate(address _investor, uint16 _rate, uint16 _additionalRate, uint32 _workUntil) onlyOwner {
-        exclusiveRate[_investor] = ExclusiveRate(_workUntil, _rate, _additionalRate, true);
+    function setExclusiveRate(address _investor, uint _rate, uint16 _bonusPercent1000, uint32 _workUntil) onlyOwner {
+        exclusiveRate[_investor] = ExclusiveRate(_workUntil, _rate, _bonusPercent1000, true);
     }
 
     function removeExclusiveRate(address _investor) onlyOwner {
