@@ -157,7 +157,7 @@ contract Crowdsale {
     }
 
     /**
-     * @returns true if crowdsale event has started
+     * @return true if crowdsale event has started
      */
     function hasStarted() public constant returns (bool) {
         return now >= startTime;
