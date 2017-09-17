@@ -157,6 +157,13 @@ contract Crowdsale {
     }
 
     /**
+     * @returns true if crowdsale event has started
+     */
+    function hasStarted() public constant returns (bool) {
+        return now >= startTime;
+    }
+
+    /**
      * @dev Check this crowdsale event has ended considering with amount to buy.
      * @param _value Amount to spend.
      * @return true if crowdsale event has ended
