@@ -14,7 +14,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
     address constant bountyAddress = 0x0025ea8bBBB72199cf70FE25F92d3B298C3B162A;
     address constant icoAccountAddress = 0x001a041f7ABAb9871a22D2bEd0EC4dAb228866c3;
 
-    MyWillRateProviderI rateProvider;
+    MyWillRateProviderI public rateProvider;
 
     function MyWillCrowdsale(
             uint32 _startTime,
