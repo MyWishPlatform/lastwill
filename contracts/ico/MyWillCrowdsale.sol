@@ -63,7 +63,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
 
     /**
      * @dev Admin can set new rate provider.
-     * @param New rate provider.
+     * @param _rateProviderAddress New rate provider.
      */
     function setRateProvider(address _rateProviderAddress) onlyOwner {
         require(_rateProviderAddress != 0);
@@ -74,7 +74,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
      * @dev Admin can move end time.
      * @param _endTime New end time.
      */
-    function setEndTime(uint32 _endTime) onlyAdmin {
+    function setEndTime(uint32 _endTime) onlyOwner {
         endTime = _endTime;
     }
 
