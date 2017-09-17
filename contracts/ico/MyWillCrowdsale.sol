@@ -9,7 +9,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
     uint constant teamTokens = 11000000 * TOKEN_DECIMAL_MULTIPLIER;
     uint constant bountyTokens = 2000000 * TOKEN_DECIMAL_MULTIPLIER;
     uint constant icoTokens = 3038800 * TOKEN_DECIMAL_MULTIPLIER;
-    uint constant minimalPurchase = 0.005 ether;
+    uint constant minimalPurchase = 0.05 ether;
     address constant teamAddress = 0x001a041f7ABAb9871a22D2bEd0EC4dAb228866c3;
     address constant bountyAddress = 0x0025ea8bBBB72199cf70FE25F92d3B298C3B162A;
     address constant icoAccountAddress = 0x003b3f928c428525e9836C1d1b52016F4833c2f0;
@@ -40,25 +40,42 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
         // pre ICO
     }
 
+    /**
+     * @dev override token creation to integrate with MyWill token.
+     */
     function createTokenContract() internal returns (MintableToken) {
         return new MyWillToken();
     }
 
+    /**
+     * @dev override getRate to integrate with rate provider.
+     */
     function getRate(uint _value) internal constant returns (uint) {
         return rateProvider.getRate(msg.sender, soldTokens, _value);
     }
 
+    /**
+     * @dev override getRateScale to integrate with rate provider.
+     */
     function getRateScale() internal constant returns (uint) {
         return rateProvider.getRateScale();
     }
 
-    function transferTokenOwnership(address _newOwner) onlyOwner {
-        token.transferOwnership(_newOwner);
-    }
-
+    /**
+     * @dev Admin can set new rate provider.
+     * @param New rate provider.
+     */
     function setRateProvider(address _rateProviderAddress) onlyOwner {
         require(_rateProviderAddress != 0);
         rateProvider = MyWillRateProviderI(_rateProviderAddress);
+    }
+
+    /**
+     * @dev Admin can move end time.
+     * @param _endTime New end time.
+     */
+    function setEndTime(uint32 _endTime) onlyAdmin {
+        endTime = _endTime;
     }
 
     function validPurchase(uint _amountWei, uint _actualRate, uint _totalSupply) internal constant returns (bool) {
