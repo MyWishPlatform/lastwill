@@ -30,7 +30,6 @@ contract MyWillToken is usingMyWillConsts, MintableToken {
     }
 
     function addExcluded(address _toExclude) onlyOwner {
-        require(msg.sender = crowdsale);
         excluded[_toExclude] = true;
     }
 
