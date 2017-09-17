@@ -1,6 +1,5 @@
 pragma solidity ^0.4.16;
 
-import './zeppelin/math/SafeMath.sol';
 import "./MyWillConsts.sol";
 import "./zeppelin/ownership/Ownable.sol";
 
@@ -12,24 +11,32 @@ contract MyWillRateProviderI {
      * @param amountWei Amount of wei to purchase.
      * @return ETH to Token rate.
      */
-    function getRate(address buyer, uint totalSold, uint amountWei) returns (uint rate);
+    function getRate(address buyer, uint totalSold, uint amountWei) public constant returns (uint);
+
+    /**
+     * @dev rate scale (or divider), to support not integer rates.
+     * @return Rate divider.
+     */
+    function getRateScale() public constant returns (uint);
 }
 
 contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
-    using SafeMath for uint;
-    uint constant step_30 = 20000000 * tokenDecimalMultiplier;
-    uint constant step_20 = 40000000 * tokenDecimalMultiplier;
-    uint constant step_10 = 60000000 * tokenDecimalMultiplier;
-    uint16 constant rate_30 = 1950;
-    uint16 constant rate_20 = 1800;
-    uint16 constant rate_10 = 1650;
+    // rate calculate accuracy
+    uint constant RATE_SCALE = 10000;
+    uint constant STEP_30 = 20000000 * TOKEN_DECIMAL_MULTIPLIER;
+    uint constant STEP_20 = 40000000 * TOKEN_DECIMAL_MULTIPLIER;
+    uint constant STEP_10 = 60000000 * TOKEN_DECIMAL_MULTIPLIER;
+    uint constant RATE_30 = 1950 * RATE_SCALE;
+    uint constant RATE_20 = 1800 * RATE_SCALE;
+    uint constant RATE_10 = 1650 * RATE_SCALE;
+    uint constant BASE_RATE = 1500 * RATE_SCALE;
 
     struct ExclusiveRate {
         // be careful, accuracies this about 15 minutes
         uint32 workUntil;
         // exclusive rate or 0
         uint rate;
-        // additional rate or 0
+        // rate bonus percent, which will be divided by 1000 or 0
         uint16 bonusPercent1000;
         // flag to check, that record exists
         bool exists;
@@ -37,50 +44,54 @@ contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
 
     mapping(address => ExclusiveRate) exclusiveRate;
 
-    function getRate(address buyer, uint totalSold, uint amountWei) returns (uint rate) {
-        uint baseRate;
+    function getRateScale() public constant returns (uint) {
+        return RATE_SCALE;
+    }
+
+    function getRate(address buyer, uint totalSold, uint amountWei) public constant returns (uint) {
+        uint rate;
         // apply sale
-        if (totalSold < step_30) {
-            baseRate = rate_30;
+        if (totalSold < STEP_30) {
+            rate = RATE_30;
         }
-        else if (totalSold < step_20) {
-            baseRate = rate_20;
+        else if (totalSold < STEP_20) {
+            rate = RATE_20;
         }
-        else if (totalSold < step_10) {
-            baseRate = rate_10;
+        else if (totalSold < STEP_10) {
+            rate = RATE_10;
         }
         else {
-            baseRate = rate;
+            rate = BASE_RATE;
         }
 
         // apply bonus for amount
         if (amountWei >= 1000 ether) {
-            baseRate += baseRate * 13 / 100;
+            rate += rate * 13 / 100;
         }
         else if (amountWei >= 500 ether) {
-            baseRate += baseRate * 10 / 100;
+            rate += rate * 10 / 100;
         }
         else if (amountWei >= 100 ether) {
-            baseRate += baseRate * 7 / 100;
+            rate += rate * 7 / 100;
         }
         else if (amountWei >= 50 ether) {
-            baseRate += baseRate * 5 / 100;
+            rate += rate * 5 / 100;
         }
         else if (amountWei >= 30 ether) {
-            baseRate += baseRate * 4 / 100;
+            rate += rate * 4 / 100;
         }
         else if (amountWei >= 10 ether) {
-            baseRate += baseRate * 25 / 1000;
+            rate += rate * 25 / 1000;
         }
 
         ExclusiveRate memory eRate = exclusiveRate[buyer];
         if (eRate.exists && eRate.workUntil >= now) {
             if (eRate.rate != 0) {
-                baseRate = eRate.rate;
+                rate = eRate.rate;
             }
-            baseRate += baseRate * eRate.bonusPercent1000 / 1000;
+            rate += rate * eRate.bonusPercent1000 / 1000;
         }
-        return baseRate;
+        return rate;
     }
 
     function setExclusiveRate(address _investor, uint _rate, uint16 _bonusPercent1000, uint32 _workUntil) onlyOwner {

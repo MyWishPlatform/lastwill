@@ -22,7 +22,7 @@ contract MyWillToken is usingMyWillConsts, MintableToken {
     }
 
     function decimals() constant public returns (uint8 _decimals) {
-        return tokenDecimals8;
+        return TOKEN_DECIMALS_UINT8;
     }
 
     function crowdsaleFinished() onlyOwner {
