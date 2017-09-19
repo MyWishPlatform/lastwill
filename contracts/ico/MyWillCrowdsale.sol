@@ -55,7 +55,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
     }
 
     function getBaseRate() internal constant returns (uint) {
-        return rateProvider.getBaseRate();
+        return rateProvider.getRate(msg.sender, soldTokens, minimalPurchase);
     }
 
     /**
