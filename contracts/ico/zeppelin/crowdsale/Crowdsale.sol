@@ -27,9 +27,6 @@ contract Crowdsale {
     // address where funds are collected
     address public wallet;
 
-    // how many token units a buyer gets per wei
-    uint public rate;
-
     // amount of raised money in wei
     uint public weiRaised;
 
@@ -53,17 +50,15 @@ contract Crowdsale {
     event TokenPurchase(address indexed purchaser, address indexed beneficiary, uint value, uint amount);
 
 
-    function Crowdsale(uint32 _startTime, uint32 _endTime, uint _rate, uint _hardCap, address _wallet) {
+    function Crowdsale(uint32 _startTime, uint32 _endTime, uint _hardCap, address _wallet) {
         require(_startTime >= now);
         require(_endTime >= _startTime);
-        require(_rate > 0);
         require(_wallet != 0x0);
-        require(_hardCap > _rate);
+        require(_hardCap > 0);
 
         token = createTokenContract();
         startTime = _startTime;
         endTime = _endTime;
-        rate = _rate;
         hardCap = _hardCap;
         wallet = _wallet;
     }
@@ -78,9 +73,9 @@ contract Crowdsale {
      * @dev this method might be overridden for implementing any sale logic.
      * @return Actual rate.
      */
-    function getRate(uint amount) internal constant returns (uint) {
-        return rate;
-    }
+    function getRate(uint amount) internal constant returns (uint);
+
+    function getBaseRate() internal constant returns (uint);
 
     /**
      * @dev rate scale (or divider), to support not integer rates.
@@ -162,7 +157,7 @@ contract Crowdsale {
      * @return true if crowdsale event has ended
      */
     function hasEnded() public constant returns (bool) {
-        return now > endTime || token.totalSupply() > hardCap.sub(rate);
+        return now > endTime || token.totalSupply() > hardCap.sub(getBaseRate());
     }
 
     /**

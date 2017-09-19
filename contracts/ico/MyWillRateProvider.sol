@@ -18,6 +18,11 @@ contract MyWillRateProviderI {
      * @return Rate divider.
      */
     function getRateScale() public constant returns (uint);
+
+    /**
+     * @return Absolute base rate.
+     */
+    function getBaseRate() public constant returns (uint);
 }
 
 contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
@@ -46,6 +51,10 @@ contract MyWillRateProvider is usingMyWillConsts, MyWillRateProviderI, Ownable {
 
     function getRateScale() public constant returns (uint) {
         return RATE_SCALE;
+    }
+
+    function getBaseRate() public constant returns (uint) {
+        return BASE_RATE;
     }
 
     function getRate(address buyer, uint totalSold, uint amountWei) public constant returns (uint) {

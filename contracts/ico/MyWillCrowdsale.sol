@@ -23,7 +23,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
             uint _softCapWei,
             uint _hardCapTokens
     )
-        RefundableCrowdsale(_startTime, _endTime, 1500, _hardCapTokens * TOKEN_DECIMAL_MULTIPLIER, _wallet, _softCapWei) {
+        RefundableCrowdsale(_startTime, _endTime, _hardCapTokens * TOKEN_DECIMAL_MULTIPLIER, _wallet, _softCapWei) {
 
         token.mint(teamAddress,  teamTokens);
         token.mint(bountyAddress, bountyTokens);
@@ -52,6 +52,10 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
      */
     function getRate(uint _value) internal constant returns (uint) {
         return rateProvider.getRate(msg.sender, soldTokens, _value);
+    }
+
+    function getBaseRate() internal constant returns (uint) {
+        return rateProvider.getBaseRate();
     }
 
     /**

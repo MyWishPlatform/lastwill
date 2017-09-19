@@ -14,11 +14,11 @@ contract MyWillToken is usingMyWillConsts, MintableToken {
     mapping(address => bool) excluded;
 
     function name() constant public returns (string _name) {
-        return "MyWill Coin";
+        return "YoWill Coin";
     }
 
     function symbol() constant public returns (bytes32 _symbol) {
-        return "WIL";
+        return "VIL";
     }
 
     function decimals() constant public returns (uint8 _decimals) {
