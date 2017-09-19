@@ -79,6 +79,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
      * @param _endTime New end time.
      */
     function setEndTime(uint32 _endTime) onlyOwner {
+        require(_endTime > startTime);
         endTime = _endTime;
     }
 
