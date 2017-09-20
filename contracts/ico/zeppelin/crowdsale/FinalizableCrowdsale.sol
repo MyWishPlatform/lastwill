@@ -26,8 +26,7 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
      * @dev Must be called after crowdsale ends, to do some extra finalization
      * work. Calls the contract's finalization function.
      */
-    function finalize() onlyOwner {
-        require(!isFinalized);
+    function finalize() onlyOwner notFinalized {
         require(hasEnded());
 
         finalization();
@@ -42,5 +41,10 @@ contract FinalizableCrowdsale is Crowdsale, Ownable {
      * executed entirely.
      */
     function finalization() internal {
+    }
+
+    modifier notFinalized() {
+        require(!isFinalized);
+        _;
     }
 }
