@@ -10,20 +10,19 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
     uint constant bountyTokens = 2000000 * TOKEN_DECIMAL_MULTIPLIER;
     uint constant icoTokens = 3038800 * TOKEN_DECIMAL_MULTIPLIER;
     uint constant minimalPurchase = 0.05 ether;
-    address constant teamAddress = 0x001a041f7ABAb9871a22D2bEd0EC4dAb228866c3;
-    address constant bountyAddress = 0x0025ea8bBBB72199cf70FE25F92d3B298C3B162A;
-    address constant icoAccountAddress = 0x003b3f928c428525e9836C1d1b52016F4833c2f0;
+    address constant teamAddress = 0xE4F0Ff4641f3c99de342b06c06414d94A585eFfb;
+    address constant bountyAddress = 0x76d4136d6EE53DB4cc087F2E2990283d5317A5e9;
+    address constant icoAccountAddress = 0x195610851A43E9685643A8F3b49F0F8a019204f1;
 
     MyWillRateProviderI public rateProvider;
 
     function MyWillCrowdsale(
             uint32 _startTime,
             uint32 _endTime,
-            address _wallet,
             uint _softCapWei,
             uint _hardCapTokens
     )
-        RefundableCrowdsale(_startTime, _endTime, _hardCapTokens * TOKEN_DECIMAL_MULTIPLIER, _wallet, _softCapWei) {
+        RefundableCrowdsale(_startTime, _endTime, _hardCapTokens * TOKEN_DECIMAL_MULTIPLIER, 0x80826b5b717aDd3E840343364EC9d971FBa3955C, _softCapWei) {
 
         token.mint(teamAddress,  teamTokens);
         token.mint(bountyAddress, bountyTokens);
@@ -78,7 +77,7 @@ contract MyWillCrowdsale is usingMyWillConsts, RefundableCrowdsale {
      * @dev Admin can move end time.
      * @param _endTime New end time.
      */
-    function setEndTime(uint32 _endTime) onlyOwner {
+    function setEndTime(uint32 _endTime) onlyOwner notFinalized {
         require(_endTime > startTime);
         endTime = _endTime;
     }
