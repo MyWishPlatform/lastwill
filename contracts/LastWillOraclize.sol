@@ -75,7 +75,7 @@ contract LastWillOraclize is LastWill {
             noActivity = block.timestamp >= lastActiveTs ? (block.timestamp - lastActiveTs >= noActivityPeriod) : false;
         }
         else {
-            // set not actual timestamp, but bock timestamp.
+            // set not actual timestamp, but block timestamp.
             // It might cause time gap, which in worst case equals to poll interval
             lastActiveTs = uint32(block.timestamp);
         }
