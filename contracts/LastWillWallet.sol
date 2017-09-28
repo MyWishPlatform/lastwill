@@ -4,15 +4,15 @@ import "LastWill.sol";
 
 contract LastWillWallet is LastWill {
 
-    uint256 private lastOwnerActivity;
-    uint256 private noActivityPeriod;
+    uint64 private lastOwnerActivity;
+    uint64 private noActivityPeriod;
 
     event Withdraw(address _sender, uint256 amount, address _beneficiary);
 
-    function LastWillWallet(address _targetUser, address[] _recipients, uint8[] _percents, uint32 _noActivityPeriod)
+    function LastWillWallet(address _targetUser, address[] _recipients, uint8[] _percents, uint64 _noActivityPeriod)
         LastWill(_targetUser, _recipients, _percents) {
             noActivityPeriod = _noActivityPeriod;
-            lastOwnerActivity = block.timestamp;
+            lastOwnerActivity = uint64(block.timestamp);
     }
 
     function internalCheck() internal returns (bool) {
@@ -25,7 +25,7 @@ contract LastWillWallet is LastWill {
         require(_receiver.send(_amount));
 
         Withdraw(msg.sender, _amount, _receiver);
-        lastOwnerActivity = block.timestamp;
+        lastOwnerActivity = uint64(block.timestamp);
         return this.balance;
     }
 }
