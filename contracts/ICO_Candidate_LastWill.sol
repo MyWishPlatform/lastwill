@@ -16,7 +16,7 @@ contract PreICOLastWillToken is BasicToken, Ownable {
     // a minimal amount to ether we need to gather
     uint256 public softcap;
 
-    // max we cat gather
+    // max we can gather
     uint256 public hardcap;
 
     // total tokens sold
@@ -82,12 +82,12 @@ contract PreICOLastWillToken is BasicToken, Ownable {
    }
 
     function buyTokens(address beneficiary) canBuy payable {
-        
+
         finishIfNeed();
 
         require(beneficiary != 0x0);
         require(msg.value > 0);
-        
+
 
         uint256 weiAmount = msg.value;
         uint256 tokens = weiAmount.mul(rate);

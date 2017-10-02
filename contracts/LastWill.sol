@@ -36,7 +36,7 @@ contract LastWill is SoftDestruct {
 
             assert(recipient != 0x0);
             summaryPercent += percent;
-            percents[i] = RecipientPercent(recipient,percent);
+            percents[i] = RecipientPercent(recipient, percent);
         }
         assert(summaryPercent == 100);
 
@@ -65,7 +65,7 @@ contract LastWill is SoftDestruct {
     }
 
     // ------------ FALLBACK -------------
-    // Must be less then 2300 gas
+    // Must be less than 2300 gas
     function() payable onlyAlive() notTriggered() {
         FundsAdded(msg.sender, msg.value);
     }
@@ -108,7 +108,7 @@ contract LastWill is SoftDestruct {
     /**
      * Do inner check.
      *
-     * @return bool true of accident triggered, flase otherwise.
+     * @return bool true of accident triggered, false otherwise.
      */
     function internalCheck() internal returns (bool) {}
 

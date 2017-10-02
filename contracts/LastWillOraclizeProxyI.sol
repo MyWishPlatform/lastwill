@@ -5,11 +5,10 @@ pragma solidity ^0.4.16;
  */
 contract LastWillOraclizeProxyI {
     /**
-     * Get requred amount of money for the next query call.
+     * Get required amount of money for the next query call.
      * @return wei
      */
     function getPrice() public returns (uint);
-    
     /**
      * Do check query.
      * @param target User address to check.

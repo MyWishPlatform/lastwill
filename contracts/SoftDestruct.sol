@@ -45,7 +45,7 @@ contract SoftDestruct {
 
     // ------------ MODIFIERS -----------
     /**
-     * Check that contract is not detroyed.
+     * Check that contract is not destroyed.
      */
     modifier onlyAlive() {
         if(destroyed) {
